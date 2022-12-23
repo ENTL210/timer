@@ -20,6 +20,7 @@ export default function Timer() {
     const [time, setTime] = useState(0)
     const [deadline, setDeadline] = useState(0)
     const [state, setState] = useState(false)
+    const [isCancel, setCancel] = useState(false)
 
     function increaseHour() {
         if (hours === 23) {
@@ -70,14 +71,24 @@ export default function Timer() {
     }
     
     function start() {
-        setState(true)
-        const time = (hours * 3600000) + (mins * 60000) + (seconds * 1000) - 1 
-        setDeadline(time)
+        if (hours === 0 && mins === 0 && seconds === 0) {
+            return
+        } else {
+            setState(true)
+            const time = (hours * 3600000) + (mins * 60000) + (seconds * 1000) - 1
+            setDeadline(time)
+        }
+        
     }     
 
     function stop() {
         setState(false)
         setDeadline(currentDeadline => currentDeadline + 1 )
+    }
+
+    function cancel() {
+        setDeadline(0)
+        setCancel(true);
     }
 
     function getTime() {
@@ -86,8 +97,14 @@ export default function Timer() {
         setHours(Math.floor((deadline / (1000 * 60 * 60)) % 24));
         setMins(Math.floor((deadline / 1000 / 60) % 60));
         setSeconds(Math.floor((deadline / 1000) % 60));
-        console.log(deadline);
     }
+
+    function resetTime() {
+        setHours(Math.floor((deadline / (1000 * 60 * 60)) % 24));
+        setMins(Math.floor((deadline / 1000 / 60) % 60));
+        setSeconds(Math.floor((deadline / 1000) % 60));
+    }
+
 
 
     useEffect(() => {
@@ -95,7 +112,12 @@ export default function Timer() {
             const interval = setInterval(() => getTime(), 1000);
             return () => clearInterval(interval);
        } else {
-         setState(false)
+            if (isCancel === true) {
+                resetTime()
+            } else {
+                setState(false)
+            }
+            
        }
        
     }, [deadline]) 
@@ -123,8 +145,8 @@ export default function Timer() {
                 </Seconds>
             </TimerWrapper>
             <ControlBtnWrapper>
-                <ControlBtn job={"start"} onClick={start}>Start</ControlBtn>
-                <ControlBtn job={"stop"} onClick={stop}>Stop</ControlBtn>
+                <ControlBtn job={(deadline > 0 && state === false)? "cancel" : "cancelDisabled"} onClick={cancel}>Cancel</ControlBtn>
+                <ControlBtn job={state ? "stop" : "start"} onClick={state ? stop : start}>{state ? "stop" : "start"}</ControlBtn>
             </ControlBtnWrapper>
 
 

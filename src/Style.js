@@ -126,9 +126,9 @@ const ControlBtn = styled.button`
     background: rgb(16,24,32,0.6);
     font-family: Karla-Bold;
     font-size: 25px;
-    color: white;
+    color: ${props => props.job == "cancelDisabled" ? "gray" : "white"};
     &: hover {
-        color: ${props => props.job == "start" ? "#97F25A" : "#F2674B"}
+        color: ${props => props.job == "start" ? "#97F25A" : props.job == "stop" ? "#F2674B" : props.job == "cancelDisabled" ? "gray": "white"}
     }
 `
 
